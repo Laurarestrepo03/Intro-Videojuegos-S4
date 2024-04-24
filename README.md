@@ -1,4 +1,4 @@
-# TUTORIAL SEMANA 04
-Tutorial para el ejercicio de la semana 4 del curso "introducción al desarrollo de videojuegos"
+# EJERCICIO INDIVIDUAL - SEMANA 04
+Código fuente para el ejercicio _Sonidos, personalización y distribución_.
 
 Para iniciar el juego, dar click en la tecla F5.

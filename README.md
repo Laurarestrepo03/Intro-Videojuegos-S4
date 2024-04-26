@@ -1,4 +1,12 @@
 # EJERCICIO INDIVIDUAL - SEMANA 04
 Código fuente para el ejercicio _Sonidos, personalización y distribución_.
 
-Para iniciar el juego, dar click en la tecla F5.
+## Controles 🎮
+- Movimiento: Flechas o WASD
+- Disparos: Click izquierdo
+- Escudo: Barra espaciadora
+
+## Jugar 🕹️
+- Localmente: Dar click en la tecla F5.
+- Itchi.io: <https://laurarp1.itch.io/misw-4407>
+

@@ -17,7 +17,7 @@ def system_shield_recharge(ecs_world:esper.World, shield_cfg:dict, recharge_cfg:
 
         if c_tr.value >= 0 and c_tr.value < 100:
             c_tr.timer += delta_time
-            c_tr.value = round((c_tr.timer / 5) * 100)
+            c_tr.value = round((c_tr.timer / shield_cfg["recharge"]) * 100)
             if c_tr.timer >= shield_cfg["recharge"]:
                 c_tr.timer = 0
                 c_tr.value = 100

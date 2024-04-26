@@ -5,15 +5,13 @@ from src.ecs.components.c_surface import CSurface
 from src.ecs.components.tags.c_tag_recharge import CTagRecharge
 from src.engine.service_locator import ServiceLocator
 
-def system_shield_recharge(ecs_world:esper.World, shield_cfg:dict, delta_time:float):
+def system_shield_recharge(ecs_world:esper.World, recharge_cfg:dict, delta_time:float):
     components = ecs_world.get_components(CSurface, CTagRecharge)
-    font = ServiceLocator.fonts_service.get(shield_cfg["font"], shield_cfg["size"])
+    font = ServiceLocator.fonts_service.get(recharge_cfg["font"], recharge_cfg["size"])
 
     for _, (c_s, c_tr) in components:
         if c_tr.value == 100:
-            color = pygame.Color(shield_cfg["color"]["r"],
-                                 shield_cfg["color"]["g"],
-                                 shield_cfg["color"]["b"])
+            color = pygame.Color(0,255,0)
         else: 
             color = pygame.Color(255,0,0)
 

@@ -6,9 +6,9 @@ from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy, EnemyType
 
-def system_screen_bounce(world:esper.World, screen:pygame.Surface):
+def system_screen_bounce(ecs_world:esper.World, screen:pygame.Surface):
     screen_rect = screen.get_rect()
-    components = world.get_components(CTransform, CVelocity, CSurface, CTagEnemy)
+    components = ecs_world.get_components(CTransform, CVelocity, CSurface, CTagEnemy)
 
     c_t:CTransform
     c_v:CVelocity

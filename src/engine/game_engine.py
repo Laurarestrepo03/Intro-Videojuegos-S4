@@ -3,7 +3,7 @@ import esper
 import json
 import pygame
 
-from src.create.prefab_creator import create_bullet, create_enemy_spawner, create_input_player, create_player, create_text
+from src.create.prefab_creator import create_bullet, create_enemy_spawner, create_input_player, create_player, create_shield, create_text
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
@@ -25,7 +25,9 @@ from src.ecs.systems.s_player_limit import system_player_limit
 from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_bounce import system_screen_bounce
+from src.ecs.systems.s_shield_protect import system_shield_protect
 from src.ecs.systems.s_shield_recharge import system_shield_recharge
+from src.ecs.systems.s_shield_state import system_shield_state
 
 pygbag = False
 
@@ -67,6 +69,8 @@ class GameEngine:
             self.bullet_cfg = json.load(bullet_file)
         with open(path + 'explosion.json') as explosion_file:
             self.explosion_cfg = json.load(explosion_file)
+        with open(path + 'shield.json') as shield_file:
+            self.shield_cfg = json.load(shield_file)
 
     async def run(self) -> None:
         self._create()
@@ -113,6 +117,7 @@ class GameEngine:
             system_player_state(self.ecs_world)
             system_explosion_state(self.ecs_world)
             system_hunter_state(self.ecs_world, self.enemy_cfg["Hunter"])
+            system_shield_state(self.ecs_world)
 
             system_screen_bounce(self.ecs_world, self.screen)
             system_player_limit(self.ecs_world, self.screen)
@@ -124,6 +129,7 @@ class GameEngine:
             system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
 
             system_shield_recharge(self.ecs_world, self.interface_cfg["recharge"], self.delta_time)
+            system_shield_protect(self.ecs_world, self.delta_time)
 
             system_animation(self.ecs_world, self.delta_time)
         
@@ -192,12 +198,12 @@ class GameEngine:
                     create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
                                         self._player_c_s.area.size, self.bullet_cfg)
                     
-            # TODO: handle this
-            if self.game_state == "PLAYING":
-                if c_input.name == "PLAYER_SHIELD":
-                    if c_input.phase == CommandPhase.START:
-                        self._recharge_tag.value = 0
-                        self._recharge_tag.timer = 0
+            if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100:
+                if c_input.phase == CommandPhase.START:
+                    create_shield(self.ecs_world, self.shield_cfg, self._player_c_t.pos, 
+                                  self._player_c_s.area.size, self._player_c_v.vel)
+                    self._recharge_tag.value = 0
+                    self._recharge_tag.timer = 0
         
         if c_input.name == "PLAYER_PAUSE":
             if c_input.phase == CommandPhase.START:

@@ -1,14 +1,16 @@
 {
     "image": "assets/img/shield.png",
+    "sound": "assets/snd/shield.ogg",
     "animations": {
         "number_frames": 4,
         "list": [
             {
-                "name": "SHIELD",
+                "name": "PROTECT",
                 "start": 0,
-                "end": 2,
+                "end": 3,
                 "framerate": 10
             }
         ]
-    }
+    },
+    "distance": 100
 }

@@ -8,14 +8,15 @@ from src.ecs.components.c_explosion_state import CExplosionState
 from src.ecs.components.c_hunter_state import CHunterState
 from src.ecs.components.c_input_command import CInputCommand
 from src.ecs.components.c_player_state import CPlayerState
+from src.ecs.components.c_shield_state import CShieldState
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy, EnemyType
-from src.ecs.components.tags.c_tag_explosion import CTagExplosion
 from src.ecs.components.tags.c_tag_player import CTagPlayer
 from src.ecs.components.tags.c_tag_recharge import CTagRecharge
+from src.ecs.components.tags.c_tag_shield import CTagShield
 from src.engine.service_locator import ServiceLocator
 
 def create_square(ecs_world:esper.World, size:pygame.Vector2,
@@ -128,21 +129,33 @@ def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size
                          enemy_pos.y + (enemy_size[1] / 2) - (size[1] / 2))
     vel = pygame.Vector2(0,0)
     explosion_entity = create_sprite(ecs_world, pos, vel, explosion_surface)
-    ecs_world.add_component(explosion_entity, CTagExplosion()) # no olvidar ()
     ecs_world.add_component(explosion_entity, CAnimation(explosion_info["animations"]))
     ecs_world.add_component(explosion_entity, CExplosionState())
     ServiceLocator.sounds_service.play(explosion_info["sound"])
 
-def create_text(ecs_world:esper.World, text_cfg:dict, recharge:bool=False):
-    color = pygame.Color(text_cfg["color"]["r"],
-                         text_cfg["color"]["g"],
-                         text_cfg["color"]["b"])
-    font = ServiceLocator.fonts_service.get(text_cfg["font"], text_cfg["size"]) 
+def create_shield(ecs_world:esper.World, shield_info:dict, player_pos:pygame.Vector2, 
+                  player_size:pygame.Vector2, player_vel:pygame.Vector2):
+    shield_surface = ServiceLocator.images_service.get(shield_info["image"])
+    size = shield_surface.get_size()
+    shield_size = (size[0] / shield_info["animations"]["number_frames"], size[1])
+    pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (shield_size[0] / 2), 
+                         player_pos.y + (player_size[1] / 2) - (shield_size[1] / 2))
+    shield_entity = create_sprite(ecs_world, pos, player_vel, shield_surface)
+    ecs_world.add_component(shield_entity, CTagShield())
+    ecs_world.add_component(shield_entity, CAnimation(shield_info["animations"]))
+    ecs_world.add_component(shield_entity, CShieldState())
+    ServiceLocator.sounds_service.play(shield_info["sound"])
+
+def create_text(ecs_world:esper.World, text_info:dict, recharge:bool=False):
+    color = pygame.Color(text_info["color"]["r"],
+                         text_info["color"]["g"],
+                         text_info["color"]["b"])
+    font = ServiceLocator.fonts_service.get(text_info["font"], text_info["size"]) 
     text_entity = ecs_world.create_entity()
-    text_surface = CSurface.from_text(text_cfg["text"], font, color)
+    text_surface = CSurface.from_text(text_info["text"], font, color)
     size = text_surface.area.size
-    pos = pygame.Vector2(text_cfg["position"]["x"], text_cfg["position"]["y"])
-    if text_cfg["middle"]:
+    pos = pygame.Vector2(text_info["position"]["x"], text_info["position"]["y"])
+    if text_info["middle"]:
         final_pos = pygame.Vector2(pos.x - size[0]/2, pos.y - size[1]/2)
     else:
         final_pos = pos

@@ -15,6 +15,7 @@ from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.components.tags.c_tag_enemy import CTagEnemy, EnemyType
 from src.ecs.components.tags.c_tag_explosion import CTagExplosion
 from src.ecs.components.tags.c_tag_player import CTagPlayer
+from src.ecs.components.tags.c_tag_recharge import CTagRecharge
 from src.engine.service_locator import ServiceLocator
 
 def create_square(ecs_world:esper.World, size:pygame.Vector2,
@@ -106,7 +107,8 @@ def create_input_player(ecs_world:esper.World):
     input_right = ecs_world.create_entity()
     input_up = ecs_world.create_entity()
     input_down = ecs_world.create_entity()
-    input_pause = ecs_world.create_entity()
+    input_p = ecs_world.create_entity()
+    input_space = ecs_world.create_entity()
     input_left_click = ecs_world.create_entity()
 
     ecs_world.add_component(input_left, CInputCommand("PLAYER_LEFT", [pygame.K_LEFT, pygame.K_a]))
@@ -114,7 +116,8 @@ def create_input_player(ecs_world:esper.World):
     ecs_world.add_component(input_up, CInputCommand("PLAYER_UP", [pygame.K_UP, pygame.K_w]))
     ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
     ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
-    ecs_world.add_component(input_pause, CInputCommand("PLAYER_PAUSE", [pygame.K_p]))
+    ecs_world.add_component(input_p, CInputCommand("PLAYER_PAUSE", [pygame.K_p]))
+    ecs_world.add_component(input_space, CInputCommand("PLAYER_SHIELD", [pygame.K_SPACE]))
     ecs_world.add_component(input_left_click, CInputCommand("PLAYER_FIRE", [pygame.BUTTON_LEFT]))
 
 def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size:pygame.Vector2, explosion_info:dict):
@@ -130,7 +133,7 @@ def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size
     ecs_world.add_component(explosion_entity, CExplosionState())
     ServiceLocator.sounds_service.play(explosion_info["sound"])
 
-def create_text(ecs_world:esper.World, text_cfg:dict):
+def create_text(ecs_world:esper.World, text_cfg:dict, recharge:bool=False):
     color = pygame.Color(text_cfg["color"]["r"],
                          text_cfg["color"]["g"],
                          text_cfg["color"]["b"])
@@ -146,4 +149,7 @@ def create_text(ecs_world:esper.World, text_cfg:dict):
     ecs_world.add_component(text_entity,
                             CTransform(final_pos))
     ecs_world.add_component(text_entity, text_surface)
+    if recharge:
+        ecs_world.add_component(text_entity,
+                                CTagRecharge()) # no olvidar ()
     return text_entity

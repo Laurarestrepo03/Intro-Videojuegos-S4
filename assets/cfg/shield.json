@@ -1,0 +1,14 @@
+{
+    "image": "assets/img/shield.png",
+    "animations": {
+        "number_frames": 4,
+        "list": [
+            {
+                "name": "SHIELD",
+                "start": 0,
+                "end": 2,
+                "framerate": 10
+            }
+        ]
+    }
+}

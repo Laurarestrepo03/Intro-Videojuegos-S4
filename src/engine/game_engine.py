@@ -10,6 +10,7 @@ from src.ecs.components.c_transform import CTransform
 from src.ecs.components.c_velocity import CVelocity
 from src.ecs.components.tags.c_tag_bullet import CTagBullet
 from src.ecs.components.tags.c_tag_player import CTagPlayer
+from src.ecs.components.tags.c_tag_recharge import CTagRecharge
 from src.ecs.systems.s_animation import system_animation
 from src.ecs.systems.s_bullet_limit import system_bullet_limit
 from src.ecs.systems.s_collision_bullet_enemy import system_collision_bullet_enemy
@@ -24,7 +25,9 @@ from src.ecs.systems.s_player_limit import system_player_limit
 from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_bounce import system_screen_bounce
-from src.engine.service_locator import ServiceLocator
+from src.ecs.systems.s_shield_recharge import system_shield_recharge
+
+pygbag = False
 
 class GameEngine:
     def __init__(self) -> None:
@@ -33,7 +36,7 @@ class GameEngine:
         pygame.init()    
         self.screen_w = self.window_cfg['size']['w']
         self.screen_h = self.window_cfg['size']['h']
-        self.screen = pygame.display.set_mode((self.screen_w, self.screen_h), pygame.SCALED)
+        self.screen = pygame.display.set_mode((self.screen_w, self.screen_h), 0 if pygbag else pygame.SCALED)
         screen_title = self.window_cfg['title']
         pygame.display.set_caption(screen_title)
 
@@ -87,6 +90,8 @@ class GameEngine:
         create_text(self.ecs_world, self.interface_cfg["name"])
         create_text(self.ecs_world, self.interface_cfg["instructions"])
         create_text(self.ecs_world, self.interface_cfg["shield"])
+        self._recharge_entity = create_text(self.ecs_world, self.interface_cfg["recharge"], True)
+        self._recharge_tag = self.ecs_world.component_for_entity(self._recharge_entity, CTagRecharge)
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -118,6 +123,8 @@ class GameEngine:
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.level_01_cfg, self.explosion_cfg)
             system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
 
+            system_shield_recharge(self.ecs_world, self.interface_cfg["recharge"], self.delta_time)
+
             system_animation(self.ecs_world, self.delta_time)
         
         self.ecs_world._clear_dead_entities()
@@ -137,58 +144,68 @@ class GameEngine:
         pygame.quit()
 
     def _do_action(self, c_input:CInputCommand, click_pos:tuple=None):
-        if c_input.name == "PLAYER_LEFT":
-            if c_input.phase == CommandPhase.START:
-               self._player_tag.keys_left += 1
-               if self._player_tag.keys_left == 1:
-                   self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_tag.keys_left -= 1
-                if self._player_tag.keys_left == 0:
-                    self._player_c_v.vel.x += self.player_cfg["input_velocity"]
+        
+        if self.game_state == "PLAYING":
+            if c_input.name == "PLAYER_LEFT":
+                if c_input.phase == CommandPhase.START:
+                    self._player_tag.keys_left += 1
+                    if self._player_tag.keys_left == 1:
+                        self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
+                elif c_input.phase == CommandPhase.END:
+                    self._player_tag.keys_left -= 1
+                    if self._player_tag.keys_left == 0:
+                        self._player_c_v.vel.x += self.player_cfg["input_velocity"]
                     
-        if c_input.name == "PLAYER_RIGHT":
-            if c_input.phase == CommandPhase.START:
-                self._player_tag.keys_right += 1
-                if self._player_tag.keys_right == 1:
-                    self._player_c_v.vel.x += self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_tag.keys_right -= 1
-                if self._player_tag.keys_right == 0:
-                    self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
+            if c_input.name == "PLAYER_RIGHT":
+                if c_input.phase == CommandPhase.START:
+                    self._player_tag.keys_right += 1
+                    if self._player_tag.keys_right == 1:
+                        self._player_c_v.vel.x += self.player_cfg["input_velocity"]
+                elif c_input.phase == CommandPhase.END:
+                    self._player_tag.keys_right -= 1
+                    if self._player_tag.keys_right == 0:
+                        self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
 
-        if c_input.name == "PLAYER_UP":
-            if c_input.phase == CommandPhase.START:
-                self._player_tag.keys_up += 1
-                if self._player_tag.keys_up == 1:
-                    self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_tag.keys_up -= 1
-                if self._player_tag.keys_up == 0:
-                    self._player_c_v.vel.y += self.player_cfg["input_velocity"]
+            if c_input.name == "PLAYER_UP":
+                if c_input.phase == CommandPhase.START:
+                    self._player_tag.keys_up += 1
+                    if self._player_tag.keys_up == 1:
+                        self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
+                elif c_input.phase == CommandPhase.END:
+                    self._player_tag.keys_up -= 1
+                    if self._player_tag.keys_up == 0:
+                        self._player_c_v.vel.y += self.player_cfg["input_velocity"]
 
-        if c_input.name == "PLAYER_DOWN":
-            if c_input.phase == CommandPhase.START:
-                self._player_tag.keys_down += 1
-                if self._player_tag.keys_down == 1:
-                    self._player_c_v.vel.y += self.player_cfg["input_velocity"]
-            elif c_input.phase == CommandPhase.END:
-                self._player_tag.keys_down -= 1
-                if self._player_tag.keys_down == 0:
-                    self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
+            if c_input.name == "PLAYER_DOWN":
+                if c_input.phase == CommandPhase.START:
+                    self._player_tag.keys_down += 1
+                    if self._player_tag.keys_down == 1:
+                        self._player_c_v.vel.y += self.player_cfg["input_velocity"]
+                elif c_input.phase == CommandPhase.END:
+                    self._player_tag.keys_down -= 1
+                    if self._player_tag.keys_down == 0:
+                        self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
 
-        if self.game_state == "PLAYING": 
             if c_input.name == "PLAYER_FIRE":
                 bullet_count = len(self.ecs_world.get_component(CTagBullet))
                 if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
                     create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
                                         self._player_c_s.area.size, self.bullet_cfg)
-
+                    
+            # TODO: handle this
+            if self.game_state == "PLAYING":
+                if c_input.name == "PLAYER_SHIELD":
+                    if c_input.phase == CommandPhase.START:
+                        self._recharge_tag.value = 0
+                        self._recharge_tag.timer = 0
+        
         if c_input.name == "PLAYER_PAUSE":
             if c_input.phase == CommandPhase.START:
                 if self.game_state == "PLAYING":
                     self.game_state = "PAUSED"
-                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"])
+                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"])    
                 else:
                     self.game_state = "PLAYING"
                     self.ecs_world.delete_entity(self.pause_entity)
+
+        

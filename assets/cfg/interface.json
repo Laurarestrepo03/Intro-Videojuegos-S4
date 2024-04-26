@@ -1,7 +1,7 @@
 {
     "name": {
         "font": "assets/fnt/PressStart2P.ttf",
-        "text": "Ejercicio 04",
+        "text": "EJERCICIO 04",
         "color": {
             "r": 255,
             "g": 255,
@@ -11,11 +11,27 @@
             "x": 25,
             "y": 25
         },
-        "size": 12
+        "size": 12,
+        "middle": false
     },
-    "power": {
+    "instructions": {
         "font": "assets/fnt/PressStart2P.ttf",
-        "text": "Escudo",
+        "text": "Controles: Flechas, WASD, click izquierdo",
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 0
+        },
+        "position": {
+            "x": 25,
+            "y": 50
+        },
+        "size": 8,
+        "middle": false
+    },
+    "shield": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "text": "ESCUDO",
         "color": {
             "r": 255,
             "g": 255,
@@ -25,7 +41,8 @@
             "x": 25,
             "y": 300
         },
-        "size": 12
+        "size": 12,
+        "middle": false
     },
     "pause": {
         "font": "assets/fnt/PressStart2P.ttf",
@@ -36,9 +53,10 @@
             "b": 255
         },
         "position": {
-            "x": 25,
-            "y": 300
+            "x": 320,
+            "y": 180
         },
-        "size": 12
+        "size": 12,
+        "middle": true
     }
 }

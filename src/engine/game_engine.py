@@ -33,7 +33,7 @@ class GameEngine:
         pygame.init()    
         self.screen_w = self.window_cfg['size']['w']
         self.screen_h = self.window_cfg['size']['h']
-        self.screen = pygame.display.set_mode((self.screen_w, self.screen_h), 0)
+        self.screen = pygame.display.set_mode((self.screen_w, self.screen_h), pygame.SCALED)
         screen_title = self.window_cfg['title']
         pygame.display.set_caption(screen_title)
 
@@ -84,7 +84,9 @@ class GameEngine:
         self._player_tag = self.ecs_world.component_for_entity(self._player_entity, CTagPlayer)
         create_enemy_spawner(self.ecs_world, self.level_01_cfg)
         create_input_player(self.ecs_world)
-        create_text(self.ecs_world, "Welcome", self.interface_cfg["name"]["font"], pygame.Vector2(100,100))
+        create_text(self.ecs_world, self.interface_cfg["name"])
+        create_text(self.ecs_world, self.interface_cfg["instructions"])
+        create_text(self.ecs_world, self.interface_cfg["shield"])
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -186,9 +188,7 @@ class GameEngine:
             if c_input.phase == CommandPhase.START:
                 if self.game_state == "PLAYING":
                     self.game_state = "PAUSED"
-                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"]["text"], 
-                                self.interface_cfg["pause"]["font"], 
-                                pygame.Vector2((self.screen_w/2, self.screen_h/2)))
+                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"])
                 else:
                     self.game_state = "PLAYING"
                     self.ecs_world.delete_entity(self.pause_entity)

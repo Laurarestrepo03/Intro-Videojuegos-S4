@@ -130,13 +130,20 @@ def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size
     ecs_world.add_component(explosion_entity, CExplosionState())
     ServiceLocator.sounds_service.play(explosion_info["sound"])
 
-def create_text(ecs_world:esper.World, text:str, font_path:str, pos:pygame.Vector2):
-    font = ServiceLocator.fonts_service.get(font_path)
+def create_text(ecs_world:esper.World, text_cfg:dict):
+    color = pygame.Color(text_cfg["color"]["r"],
+                         text_cfg["color"]["g"],
+                         text_cfg["color"]["b"])
+    font = ServiceLocator.fonts_service.get(text_cfg["font"], text_cfg["size"]) 
     text_entity = ecs_world.create_entity()
-    text_surface = CSurface.from_text(text, font)
+    text_surface = CSurface.from_text(text_cfg["text"], font, color)
     size = text_surface.area.size
+    pos = pygame.Vector2(text_cfg["position"]["x"], text_cfg["position"]["y"])
+    if text_cfg["middle"]:
+        final_pos = pygame.Vector2(pos.x - size[0]/2, pos.y - size[1]/2)
+    else:
+        final_pos = pos
     ecs_world.add_component(text_entity,
-                            CTransform((pos.x - size[0]/2, pos.y - size[1]/2)))
-    ecs_world.add_component(text_entity, 
-                             text_surface)
+                            CTransform(final_pos))
+    ecs_world.add_component(text_entity, text_surface)
     return text_entity

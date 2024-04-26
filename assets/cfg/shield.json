@@ -12,5 +12,7 @@
             }
         ]
     },
-    "distance": 100
+    "distance": 100,
+    "duration": 2,
+    "recharge": 5
 }

@@ -117,7 +117,7 @@ class GameEngine:
             system_player_state(self.ecs_world)
             system_explosion_state(self.ecs_world)
             system_hunter_state(self.ecs_world, self.enemy_cfg["Hunter"])
-            system_shield_state(self.ecs_world)
+            system_shield_state(self.ecs_world, self.shield_cfg)
 
             system_screen_bounce(self.ecs_world, self.screen)
             system_player_limit(self.ecs_world, self.screen)
@@ -128,7 +128,7 @@ class GameEngine:
             system_collision_player_enemy(self.ecs_world, self._player_entity, self.level_01_cfg, self.explosion_cfg)
             system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
 
-            system_shield_recharge(self.ecs_world, self.interface_cfg["recharge"], self.delta_time)
+            system_shield_recharge(self.ecs_world, self.shield_cfg, self.interface_cfg["recharge"], self.delta_time)
             system_shield_protect(self.ecs_world, self.shield_cfg, self.explosion_cfg, self.delta_time)
 
             system_animation(self.ecs_world, self.delta_time)

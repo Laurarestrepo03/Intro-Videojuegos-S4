@@ -29,7 +29,7 @@ from src.ecs.systems.s_shield_protect import system_shield_protect
 from src.ecs.systems.s_shield_recharge import system_shield_recharge
 from src.ecs.systems.s_shield_state import system_shield_state
 
-pygbag = False
+pygbag = True
 
 class GameEngine:
     def __init__(self) -> None:

@@ -16,7 +16,7 @@
     },
     "instructions": {
         "font": "assets/fnt/PressStart2P.ttf",
-        "text": "Controles: Flechas, WASD, click izquierdo, barra espacial",
+        "text": "Controles: Flechas, WASD, click izquierdo, barra espaciadora",
         "color": {
             "r": 255,
             "g": 255,

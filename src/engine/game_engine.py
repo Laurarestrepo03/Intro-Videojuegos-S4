@@ -129,7 +129,7 @@ class GameEngine:
             system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
 
             system_shield_recharge(self.ecs_world, self.interface_cfg["recharge"], self.delta_time)
-            system_shield_protect(self.ecs_world, self.delta_time)
+            system_shield_protect(self.ecs_world, self.shield_cfg, self.explosion_cfg, self.delta_time)
 
             system_animation(self.ecs_world, self.delta_time)
         

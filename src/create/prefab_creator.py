@@ -106,12 +106,15 @@ def create_input_player(ecs_world:esper.World):
     input_right = ecs_world.create_entity()
     input_up = ecs_world.create_entity()
     input_down = ecs_world.create_entity()
+    input_pause = ecs_world.create_entity()
     input_left_click = ecs_world.create_entity()
 
     ecs_world.add_component(input_left, CInputCommand("PLAYER_LEFT", [pygame.K_LEFT, pygame.K_a]))
     ecs_world.add_component(input_right, CInputCommand("PLAYER_RIGHT", [pygame.K_RIGHT, pygame.K_d]))
     ecs_world.add_component(input_up, CInputCommand("PLAYER_UP", [pygame.K_UP, pygame.K_w]))
     ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
+    ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
+    ecs_world.add_component(input_pause, CInputCommand("PLAYER_PAUSE", [pygame.K_p]))
     ecs_world.add_component(input_left_click, CInputCommand("PLAYER_FIRE", [pygame.BUTTON_LEFT]))
 
 def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size:pygame.Vector2, explosion_info:dict):
@@ -126,3 +129,14 @@ def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size
     ecs_world.add_component(explosion_entity, CAnimation(explosion_info["animations"]))
     ecs_world.add_component(explosion_entity, CExplosionState())
     ServiceLocator.sounds_service.play(explosion_info["sound"])
+
+def create_text(ecs_world:esper.World, text:str, font_path:str, pos:pygame.Vector2):
+    font = ServiceLocator.fonts_service.get(font_path)
+    text_entity = ecs_world.create_entity()
+    text_surface = CSurface.from_text(text, font)
+    size = text_surface.area.size
+    ecs_world.add_component(text_entity,
+                            CTransform((pos.x - size[0]/2, pos.y - size[1]/2)))
+    ecs_world.add_component(text_entity, 
+                             text_surface)
+    return text_entity

@@ -1,5 +1,7 @@
 import pygame
 
+from src.engine.service_locator import ServiceLocator
+
 class CSurface:
     def __init__(self, size:pygame.Vector2, color:pygame.Color) -> None:
         self.surf = pygame.Surface(size)
@@ -12,6 +14,11 @@ class CSurface:
         c_surf.surf = surface
         c_surf.area = surface.get_rect()
         return c_surf
+    
+    @classmethod
+    def from_text(cls, text: str, font:pygame.font):
+        text_surface = font.render(text, False, pygame.Color(255,255,255))
+        return cls.from_surface(text_surface)
     
     def get_area_relative(area:pygame.Rect, pos_topLeft:pygame.Vector2):
         new_rect = area.copy()

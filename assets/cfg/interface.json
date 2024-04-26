@@ -1,0 +1,44 @@
+{
+    "name": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "text": "Ejercicio 04",
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        "position": {
+            "x": 25,
+            "y": 25
+        },
+        "size": 12
+    },
+    "power": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "text": "Escudo",
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        "position": {
+            "x": 25,
+            "y": 300
+        },
+        "size": 12
+    },
+    "pause": {
+        "font": "assets/fnt/PressStart2P.ttf",
+        "text": "PAUSADO",
+        "color": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+        },
+        "position": {
+            "x": 25,
+            "y": 300
+        },
+        "size": 12
+    }
+}

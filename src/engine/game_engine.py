@@ -3,7 +3,7 @@ import esper
 import json
 import pygame
 
-from src.create.prefab_creator import create_bullet, create_enemy_spawner, create_input_player, create_player
+from src.create.prefab_creator import create_bullet, create_enemy_spawner, create_input_player, create_player, create_text
 from src.ecs.components.c_input_command import CInputCommand, CommandPhase
 from src.ecs.components.c_surface import CSurface
 from src.ecs.components.c_transform import CTransform
@@ -24,15 +24,16 @@ from src.ecs.systems.s_player_limit import system_player_limit
 from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_bounce import system_screen_bounce
+from src.engine.service_locator import ServiceLocator
 
 class GameEngine:
     def __init__(self) -> None:
         self.load_config_files()
 
         pygame.init()    
-        screen_w = self.window_cfg['size']['w']
-        screen_h = self.window_cfg['size']['h']
-        self.screen = pygame.display.set_mode((screen_w, screen_h), 0)
+        self.screen_w = self.window_cfg['size']['w']
+        self.screen_h = self.window_cfg['size']['h']
+        self.screen = pygame.display.set_mode((self.screen_w, self.screen_h), 0)
         screen_title = self.window_cfg['title']
         pygame.display.set_caption(screen_title)
 
@@ -42,10 +43,15 @@ class GameEngine:
         self.delta_time = 0
         self.current_time = 0
 
+        self.game_state = "PLAYING"
+        self.pause_entity = -1
+
         self.ecs_world = esper.World()
 
     def load_config_files(self):
         path = 'assets/cfg/'
+        with open(path + 'interface.json', encoding="utf-8") as interface_file:
+            self.interface_cfg = json.load(interface_file)
         with open(path + 'window.json', encoding="utf-8") as window_file:
             self.window_cfg = json.load(window_file)
         with open(path + 'enemies.json') as enemy_file:
@@ -78,11 +84,13 @@ class GameEngine:
         self._player_tag = self.ecs_world.component_for_entity(self._player_entity, CTagPlayer)
         create_enemy_spawner(self.ecs_world, self.level_01_cfg)
         create_input_player(self.ecs_world)
+        create_text(self.ecs_world, "Welcome", self.interface_cfg["name"]["font"], pygame.Vector2(100,100))
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
         self.delta_time = self.clock.get_time() / 1000.0
-        self.current_time += self.delta_time
+        if self.game_state == "PLAYING":
+            self.current_time += self.delta_time
 
     def _process_events(self):
         for event in pygame.event.get():
@@ -91,23 +99,25 @@ class GameEngine:
                 self.is_running = False
 
     def _update(self):
-        system_enemy_spawner(self.ecs_world, self.current_time, self.enemy_cfg)
-        system_movement(self.ecs_world, self.delta_time)
+        if self.game_state == "PLAYING":
+            system_enemy_spawner(self.ecs_world, self.current_time, self.enemy_cfg)
+            system_movement(self.ecs_world, self.delta_time)
 
-        system_player_state(self.ecs_world)
-        system_explosion_state(self.ecs_world)
-        system_hunter_state(self.ecs_world, self.enemy_cfg["Hunter"])
+            system_player_state(self.ecs_world)
+            system_explosion_state(self.ecs_world)
+            system_hunter_state(self.ecs_world, self.enemy_cfg["Hunter"])
 
-        system_screen_bounce(self.ecs_world, self.screen)
-        system_player_limit(self.ecs_world, self.screen)
-        system_bullet_limit(self.ecs_world, self.screen)
+            system_screen_bounce(self.ecs_world, self.screen)
+            system_player_limit(self.ecs_world, self.screen)
+            system_bullet_limit(self.ecs_world, self.screen)
 
-        system_hunter_chase(self.ecs_world, self.enemy_cfg["Hunter"])
-       
-        system_collision_player_enemy(self.ecs_world, self._player_entity, self.level_01_cfg, self.explosion_cfg)
-        system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
+            system_hunter_chase(self.ecs_world, self.enemy_cfg["Hunter"])
+        
+            system_collision_player_enemy(self.ecs_world, self._player_entity, self.level_01_cfg, self.explosion_cfg)
+            system_collision_bullet_enemy(self.ecs_world, self.explosion_cfg)
 
-        system_animation(self.ecs_world, self.delta_time)
+            system_animation(self.ecs_world, self.delta_time)
+        
         self.ecs_world._clear_dead_entities()
 
     def _draw(self):
@@ -165,8 +175,20 @@ class GameEngine:
                 if self._player_tag.keys_down == 0:
                     self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
 
-        if c_input.name == "PLAYER_FIRE":
-            bullet_count = len(self.ecs_world.get_component(CTagBullet))
-            if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
-                create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
-                                     self._player_c_s.area.size, self.bullet_cfg)
+        if self.game_state == "PLAYING": 
+            if c_input.name == "PLAYER_FIRE":
+                bullet_count = len(self.ecs_world.get_component(CTagBullet))
+                if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
+                    create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
+                                        self._player_c_s.area.size, self.bullet_cfg)
+
+        if c_input.name == "PLAYER_PAUSE":
+            if c_input.phase == CommandPhase.START:
+                if self.game_state == "PLAYING":
+                    self.game_state = "PAUSED"
+                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"]["text"], 
+                                self.interface_cfg["pause"]["font"], 
+                                pygame.Vector2((self.screen_w/2, self.screen_h/2)))
+                else:
+                    self.game_state = "PLAYING"
+                    self.ecs_world.delete_entity(self.pause_entity)

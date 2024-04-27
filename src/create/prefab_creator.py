@@ -132,14 +132,14 @@ def create_explosion(ecs_world:esper.World, enemy_pos:pygame.Vector2, enemy_size
     ecs_world.add_component(explosion_entity, CExplosionState())
     ServiceLocator.sounds_service.play(explosion_info["sound"])
 
-def create_shield(ecs_world:esper.World, shield_info:dict, player_pos:pygame.Vector2, 
-                  player_size:pygame.Vector2, player_vel:pygame.Vector2):
+def create_shield(ecs_world:esper.World, shield_info:dict, player_pos:pygame.Vector2, player_size:pygame.Vector2):
     shield_surface = ServiceLocator.images_service.get(shield_info["image"])
     size = shield_surface.get_size()
     shield_size = (size[0] / shield_info["animations"]["number_frames"], size[1])
     pos = pygame.Vector2(player_pos.x + (player_size[0] / 2) - (shield_size[0] / 2), 
                          player_pos.y + (player_size[1] / 2) - (shield_size[1] / 2))
-    shield_entity = create_sprite(ecs_world, pos, player_vel, shield_surface)
+    vel = pygame.Vector2(0,0)
+    shield_entity = create_sprite(ecs_world, pos, vel, shield_surface)
     ecs_world.add_component(shield_entity, CTagShield())
     ecs_world.add_component(shield_entity, CAnimation(shield_info["animations"]))
     ecs_world.add_component(shield_entity, CShieldState())

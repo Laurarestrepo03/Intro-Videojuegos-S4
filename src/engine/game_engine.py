@@ -25,6 +25,7 @@ from src.ecs.systems.s_player_limit import system_player_limit
 from src.ecs.systems.s_player_state import system_player_state
 from src.ecs.systems.s_rendering import system_rendering
 from src.ecs.systems.s_screen_bounce import system_screen_bounce
+from src.ecs.systems.s_shield_pos import system_shield_pos
 from src.ecs.systems.s_shield_protect import system_shield_protect
 from src.ecs.systems.s_shield_recharge import system_shield_recharge
 from src.ecs.systems.s_shield_state import system_shield_state
@@ -130,6 +131,7 @@ class GameEngine:
 
             system_shield_recharge(self.ecs_world, self.shield_cfg, self.interface_cfg["recharge"], self.delta_time)
             system_shield_protect(self.ecs_world, self.shield_cfg, self.explosion_cfg, self.delta_time)
+            system_shield_pos(self.ecs_world, self.shield_cfg)
 
             system_animation(self.ecs_world, self.delta_time)
         
@@ -200,8 +202,8 @@ class GameEngine:
                     
             if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100:
                 if c_input.phase == CommandPhase.START:
-                    create_shield(self.ecs_world, self.shield_cfg, self._player_c_t.pos, 
-                                  self._player_c_s.area.size, self._player_c_v.vel)
+                    create_shield(self.ecs_world, self.shield_cfg, 
+                                  self._player_c_t.pos, self._player_c_s.area.size)
                     self._recharge_tag.value = 0
                     self._recharge_tag.timer = 0
         

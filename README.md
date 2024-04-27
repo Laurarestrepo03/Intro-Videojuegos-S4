@@ -8,5 +8,5 @@ Código fuente para el ejercicio _Sonidos, personalización y distribución_.
 
 ## Jugar 🕹️
 - Localmente: Dar click en la tecla F5.
-- Itch.io: <https://laurarp1.itch.io/misw-4407>
+- Itch.io: <https://laurarp1.itch.io/misw-4407-s4>
 

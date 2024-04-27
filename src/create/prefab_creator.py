@@ -116,7 +116,6 @@ def create_input_player(ecs_world:esper.World):
     ecs_world.add_component(input_right, CInputCommand("PLAYER_RIGHT", [pygame.K_RIGHT, pygame.K_d]))
     ecs_world.add_component(input_up, CInputCommand("PLAYER_UP", [pygame.K_UP, pygame.K_w]))
     ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
-    ecs_world.add_component(input_down, CInputCommand("PLAYER_DOWN", [pygame.K_DOWN, pygame.K_s]))
     ecs_world.add_component(input_p, CInputCommand("PLAYER_PAUSE", [pygame.K_p]))
     ecs_world.add_component(input_space, CInputCommand("PLAYER_SHIELD", [pygame.K_SPACE]))
     ecs_world.add_component(input_left_click, CInputCommand("PLAYER_FIRE", [pygame.BUTTON_LEFT]))

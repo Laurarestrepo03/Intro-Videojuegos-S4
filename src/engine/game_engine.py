@@ -95,8 +95,8 @@ class GameEngine:
         create_text(self.ecs_world, self.interface_cfg["name"])
         create_text(self.ecs_world, self.interface_cfg["instructions"])
         create_text(self.ecs_world, self.interface_cfg["shield"])
-        self._recharge_entity = create_text(self.ecs_world, self.interface_cfg["recharge"], True)
-        self._recharge_tag = self.ecs_world.component_for_entity(self._recharge_entity, CTagRecharge)
+        recharge_entity = create_text(self.ecs_world, self.interface_cfg["recharge"], True)
+        self._recharge_tag = self.ecs_world.component_for_entity(recharge_entity, CTagRecharge)
 
     def _calculate_time(self):
         self.clock.tick(self.framerate)
@@ -153,67 +153,64 @@ class GameEngine:
 
     def _do_action(self, c_input:CInputCommand, click_pos:tuple=None):
         
-        if self.game_state == "PLAYING":
-            if c_input.name == "PLAYER_LEFT":
-                if c_input.phase == CommandPhase.START:
-                    self._player_tag.keys_left += 1
-                    if self._player_tag.keys_left == 1:
-                        self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
-                elif c_input.phase == CommandPhase.END:
-                    self._player_tag.keys_left -= 1
-                    if self._player_tag.keys_left == 0:
-                        self._player_c_v.vel.x += self.player_cfg["input_velocity"]
-                    
-            if c_input.name == "PLAYER_RIGHT":
-                if c_input.phase == CommandPhase.START:
-                    self._player_tag.keys_right += 1
-                    if self._player_tag.keys_right == 1:
-                        self._player_c_v.vel.x += self.player_cfg["input_velocity"]
-                elif c_input.phase == CommandPhase.END:
-                    self._player_tag.keys_right -= 1
-                    if self._player_tag.keys_right == 0:
-                        self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
-
-            if c_input.name == "PLAYER_UP":
-                if c_input.phase == CommandPhase.START:
-                    self._player_tag.keys_up += 1
-                    if self._player_tag.keys_up == 1:
-                        self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
-                elif c_input.phase == CommandPhase.END:
-                    self._player_tag.keys_up -= 1
-                    if self._player_tag.keys_up == 0:
-                        self._player_c_v.vel.y += self.player_cfg["input_velocity"]
-
-            if c_input.name == "PLAYER_DOWN":
-                if c_input.phase == CommandPhase.START:
-                    self._player_tag.keys_down += 1
-                    if self._player_tag.keys_down == 1:
-                        self._player_c_v.vel.y += self.player_cfg["input_velocity"]
-                elif c_input.phase == CommandPhase.END:
-                    self._player_tag.keys_down -= 1
-                    if self._player_tag.keys_down == 0:
-                        self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
-
-            if c_input.name == "PLAYER_FIRE":
-                bullet_count = len(self.ecs_world.get_component(CTagBullet))
-                if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
-                    create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
-                                        self._player_c_s.area.size, self.bullet_cfg)
-                    
-            if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100:
-                if c_input.phase == CommandPhase.START:
-                    create_shield(self.ecs_world, self.shield_cfg, 
-                                  self._player_c_t.pos, self._player_c_s.area.size)
-                    self._recharge_tag.value = 0
-                    self._recharge_tag.timer = 0
-        
-        if c_input.name == "PLAYER_PAUSE":
+        if c_input.name == "PLAYER_LEFT":
             if c_input.phase == CommandPhase.START:
-                if self.game_state == "PLAYING":
-                    self.game_state = "PAUSED"
-                    self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"])    
-                else:
-                    self.game_state = "PLAYING"
-                    self.ecs_world.delete_entity(self.pause_entity)
+                self._player_tag.keys_left += 1
+                if self._player_tag.keys_left == 1:
+                    self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
+            elif c_input.phase == CommandPhase.END:
+                self._player_tag.keys_left -= 1
+                if self._player_tag.keys_left == 0:
+                    self._player_c_v.vel.x += self.player_cfg["input_velocity"]
+                
+        if c_input.name == "PLAYER_RIGHT":
+            if c_input.phase == CommandPhase.START:
+                self._player_tag.keys_right += 1
+                if self._player_tag.keys_right == 1:
+                    self._player_c_v.vel.x += self.player_cfg["input_velocity"]
+            elif c_input.phase == CommandPhase.END:
+                self._player_tag.keys_right -= 1
+                if self._player_tag.keys_right == 0:
+                    self._player_c_v.vel.x -= self.player_cfg["input_velocity"]
 
+        if c_input.name == "PLAYER_UP":
+            if c_input.phase == CommandPhase.START:
+                self._player_tag.keys_up += 1
+                if self._player_tag.keys_up == 1:
+                    self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
+            elif c_input.phase == CommandPhase.END:
+                self._player_tag.keys_up -= 1
+                if self._player_tag.keys_up == 0:
+                    self._player_c_v.vel.y += self.player_cfg["input_velocity"]
+
+        if c_input.name == "PLAYER_DOWN":
+            if c_input.phase == CommandPhase.START:
+                self._player_tag.keys_down += 1
+                if self._player_tag.keys_down == 1:
+                    self._player_c_v.vel.y += self.player_cfg["input_velocity"]
+            elif c_input.phase == CommandPhase.END:
+                self._player_tag.keys_down -= 1
+                if self._player_tag.keys_down == 0:
+                    self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
+
+        if c_input.name == "PLAYER_FIRE":
+            bullet_count = len(self.ecs_world.get_component(CTagBullet))
+            if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
+                create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
+                                    self._player_c_s.area.size, self.bullet_cfg)
+                
+        if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100:
+            if c_input.phase == CommandPhase.START:
+                create_shield(self.ecs_world, self.shield_cfg, 
+                                self._player_c_t.pos, self._player_c_s.area.size)
+                self._recharge_tag.value = 0
+                self._recharge_tag.timer = 0
         
+        if c_input.name == "PLAYER_PAUSE" and c_input.phase == CommandPhase.START:
+            if self.game_state == "PLAYING":
+                self.game_state = "PAUSED"
+                self.pause_entity = create_text(self.ecs_world, self.interface_cfg["pause"])    
+            else:
+                self.game_state = "PLAYING"
+                self.ecs_world.delete_entity(self.pause_entity)
+                   

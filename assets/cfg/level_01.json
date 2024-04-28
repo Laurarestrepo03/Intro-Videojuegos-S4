@@ -64,11 +64,59 @@
             }
         },
         {
+            "time": 10.0,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 80,
+                "y": 180
+            }
+        },
+        {
+            "time": 10.5,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 205,
+                "y": 290
+            }
+        },
+        {
+            "time": 11.0,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 405,
+                "y": 290
+            }
+        },
+        {
+            "time": 11.5,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 205,
+                "y": 30
+            }
+        },
+        {
+            "time": 12.0,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 405,
+                "y": 30
+            }
+        },
+        {
             "time": 12.0,
             "enemy_type": "AsteroidD",
             "position": {
                 "x": 600,
                 "y": 50
+            }
+        },
+        {
+            "time": 12.5,
+            "enemy_type": "Hunter",
+            "position": {
+                "x": 520,
+                "y": 180
             }
         },
         {

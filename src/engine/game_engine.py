@@ -193,13 +193,13 @@ class GameEngine:
                 if self._player_tag.keys_down == 0:
                     self._player_c_v.vel.y -= self.player_cfg["input_velocity"]
 
-        if c_input.name == "PLAYER_FIRE":
+        if c_input.name == "PLAYER_FIRE" and self.game_state == "PLAYING":
             bullet_count = len(self.ecs_world.get_component(CTagBullet))
             if bullet_count < self.level_01_cfg["player_spawn"]["max_bullets"]:
                 create_bullet(self.ecs_world, click_pos, self._player_c_t.pos,
                                     self._player_c_s.area.size, self.bullet_cfg)
                 
-        if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100:
+        if c_input.name == "PLAYER_SHIELD" and self._recharge_tag.value == 100 and self.game_state == "PLAYING":
             if c_input.phase == CommandPhase.START:
                 create_shield(self.ecs_world, self.shield_cfg, 
                                 self._player_c_t.pos, self._player_c_s.area.size)

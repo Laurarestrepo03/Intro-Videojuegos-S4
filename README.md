@@ -5,6 +5,7 @@ Código fuente para el ejercicio _Sonidos, personalización y distribución_.
 - Movimiento: Flechas o WASD
 - Disparos: Click izquierdo
 - Escudo: Barra espaciadora
+- Pausa: P
 
 ## Jugar 🕹️
 - Localmente: Dar click en la tecla F5.
